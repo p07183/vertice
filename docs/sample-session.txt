@@ -1,0 +1,9 @@
+# Sessão de exemplo: build/vertice < docs/sample-session.txt
+customer 7 10 Ana Souza
+author 1 M Machado de Assis
+book 1 1 39.90 Dom Casmurro
+book 2 1 25.00 Memórias Póstumas de Brás Cubas
+add 1 2
+add 2 1
+invoice
+pay

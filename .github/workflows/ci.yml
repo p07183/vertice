@@ -1,0 +1,22 @@
+# Continuous integration pipeline of Vértice.
+# For now it only builds the software. Add one job for each security check:
+# SAST, dynamic analysis and DAST.
+name: CI
+
+on:
+  push:
+    branches: ["develop", "feature/**"]
+  pull_request:
+    branches: ["develop"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build the software and the unit tests
+        run: make
