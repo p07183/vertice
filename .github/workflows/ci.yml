@@ -27,6 +27,8 @@ jobs:
   dynamic-analysis:
     needs: build
     runs-on: ubuntu-latest
+    env:
+      PAYMENT_KEY: ${{ secrets.PAYMENT_KEY }}
     steps:
       - uses: actions/checkout@v6
       - name: Install Valgrind
