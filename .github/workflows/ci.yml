@@ -1,22 +1,48 @@
-# Continuous integration pipeline of Vértice.
-# For now it only builds the software. Add one job for each security check:
-# SAST, dynamic analysis and DAST.
 name: CI
 
 on:
   push:
-    branches: ["develop", "feature/**"]
+    branches: [ develop, "feature/**" ]
   pull_request:
-    branches: ["develop"]
-
-permissions:
-  contents: read
+    branches: [ develop ]
 
 jobs:
   build:
-    name: Build
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Build the software and the unit tests
+      - name: Build
         run: make
+
+  sast:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Semgrep
+        run: pipx install semgrep==1.182.1
+      - name: Run SAST
+        run: make sast
+
+  dynamic-analysis:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Valgrind
+        run: sudo apt-get update && sudo apt-get install -y valgrind
+      - name: Adjust Kernel mmap
+        run: sudo sysctl -w vm.mmap_rnd_bits=28
+      - name: Run Sanitizers
+        run: make sanitizers
+      - name: Run Valgrind
+        if: ${{ !cancelled() }}
+        run: make valgrind
+
+  dast:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run DAST
+        run: make dast
